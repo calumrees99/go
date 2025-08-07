@@ -6,29 +6,28 @@ import (
 )
 
 func main() {
+	fmt.Println("Input Calculation:")
+
 	var number1 int
+	var operator string
 	var number2 int
 
-	fmt.Println("input first number:")
-	number1 = numberInput()
-
-	fmt.Println("input second number:")
-	number2 = numberInput()
-
-	add(number1, number2)
-	subtract(number1, number2)
-	multiply(number1, number2)
-	divide(number1, number2)
-}
-
-func numberInput() int {
-
-	var number int
-	_, err := fmt.Scan(&number)
-	if err != nil {
-		log.Fatal(err)
+	if _, err := fmt.Scan(&number1, &operator, &number2); err != nil {
+		log.Fatalf("Invalid input: %v", err)
 	}
-	return (number)
+
+	switch operator {
+	case "+":
+		add(number1, number2)
+	case "-":
+		subtract(number1, number2)
+	case "*":
+		multiply(number1, number2)
+	case "/":
+		divide(number1, number2)
+	default:
+		fmt.Println("Invalid operator!")
+	}
 }
 
 func add(number1 int, number2 int) {

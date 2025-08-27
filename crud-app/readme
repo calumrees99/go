@@ -1,0 +1,8 @@
+# Overview
+This folder is a simple CRUD app created from this tutoril: https://www.youtube.com/watch?v=eqvDSkuBihs
+
+# Next Steps
+- Add GET /users/ function/handler which retrieves list of all created users and their IDs
+- Use a mySQL persistent storage solution.
+- Add more properties to the user tables.
+- Add UPDATE /users/{id} function/handler to update existing user info.

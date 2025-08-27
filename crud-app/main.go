@@ -18,7 +18,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /users/{id}", getUser)
 	mux.HandleFunc("POST /users", createUser)
-	mux.HandleFunc("DELETE /users", deleteUser)
+	mux.HandleFunc("DELETE /users/{id}", deleteUser)
 
 	// Start server
 	fmt.Println("Server is listening on :8080")
@@ -74,4 +74,18 @@ func createUser(
 func deleteUser(
 	w http.ResponseWriter,
 	r *http.Request) {
+
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := userCache[id]; !ok {
+		http.Error(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	delete(userCache, id)
+	w.WriteHeader(http.StatusNoContent)
 }

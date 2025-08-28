@@ -9,6 +9,7 @@ import (
 
 type User struct {
 	Name string `json:"name"`
+	Age  *int   `json:"age"`
 }
 
 var userCache = make(map[int]User)
@@ -16,13 +17,31 @@ var userCache = make(map[int]User)
 func main() {
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /users", getUsers)
 	mux.HandleFunc("GET /users/{id}", getUser)
 	mux.HandleFunc("POST /users", createUser)
 	mux.HandleFunc("DELETE /users/{id}", deleteUser)
+	mux.HandleFunc("PATCH /users/{id}", updateUser)
 
 	// Start server
 	fmt.Println("Server is listening on :8080")
 	http.ListenAndServe(":8080", mux)
+}
+func getUsers(
+	w http.ResponseWriter,
+	r *http.Request) {
+
+	users := userCache
+
+	w.Header().Set("Content-Type", "application.json")
+	j, err := json.Marshal(users)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(j)
 }
 
 func getUser(
@@ -67,6 +86,11 @@ func createUser(
 		return
 	}
 
+	if user.Age == nil {
+		http.Error(w, "age is required", http.StatusBadRequest)
+		return
+	}
+
 	userCache[len(userCache)+1] = user
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -87,5 +111,41 @@ func deleteUser(
 	}
 
 	delete(userCache, id)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func updateUser(
+	w http.ResponseWriter,
+	r *http.Request) {
+
+	id, error := strconv.Atoi(r.PathValue("id"))
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := userCache[id]; !ok {
+		http.Error(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	var user User
+
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if user.Name == "" {
+		user.Name = userCache[id].Name
+	}
+
+	if user.Age == nil {
+		user.Age = userCache[id].Age
+	}
+
+	userCache[id] = user
+
 	w.WriteHeader(http.StatusNoContent)
 }

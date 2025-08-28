@@ -9,7 +9,7 @@ import (
 
 type User struct {
 	Name string `json:"name"`
-	Age  int    `json:"age"`
+	Age  *int   `json:"age"`
 }
 
 var userCache = make(map[int]User)
@@ -86,7 +86,7 @@ func createUser(
 		return
 	}
 
-	if user.Age == 0 {
+	if user.Age == nil {
 		http.Error(w, "age is required", http.StatusBadRequest)
 		return
 	}
@@ -141,7 +141,7 @@ func updateUser(
 		user.Name = userCache[id].Name
 	}
 
-	if user.Age == 0 {
+	if user.Age == nil {
 		user.Age = userCache[id].Age
 	}
 

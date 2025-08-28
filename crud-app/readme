@@ -2,5 +2,5 @@
 This folder is a simple CRUD app created from this tutoril: https://www.youtube.com/watch?v=eqvDSkuBihs
 
 # Next Steps
-- Modify functions to allow user to input age as 0.
 - Migrate to mySQL persistent storage solution.
+- Add go tests to this.

@@ -138,14 +138,13 @@ func updateUser(
 	}
 
 	if user.Name == "" {
-		http.Error(w, "name is required", http.StatusBadRequest)
-		return
+		user.Name = userCache[id].Name
 	}
 
 	if user.Age == 0 {
-		http.Error(w, "age is required", http.StatusBadRequest)
-		return
+		user.Age = userCache[id].Age
 	}
+
 	userCache[id] = user
 
 	w.WriteHeader(http.StatusNoContent)

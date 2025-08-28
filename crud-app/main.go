@@ -20,6 +20,7 @@ func main() {
 	mux.HandleFunc("GET /users/{id}", getUser)
 	mux.HandleFunc("POST /users", createUser)
 	mux.HandleFunc("DELETE /users/{id}", deleteUser)
+	mux.HandleFunc("PATCH /users/{id}", updateUser)
 
 	// Start server
 	fmt.Println("Server is listening on :8080")
@@ -104,5 +105,38 @@ func deleteUser(
 	}
 
 	delete(userCache, id)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func updateUser(
+	w http.ResponseWriter,
+	r *http.Request) {
+
+	id, error := strconv.Atoi(r.PathValue("id"))
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := userCache[id]; !ok {
+		http.Error(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	var user User
+
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if user.Name == "" {
+		http.Error(w, "name is required", http.StatusBadRequest)
+		return
+	}
+
+	userCache[id] = user
+
 	w.WriteHeader(http.StatusNoContent)
 }

@@ -9,6 +9,7 @@ import (
 
 type User struct {
 	Name string `json:"name"`
+	Age  int    `json:"age"`
 }
 
 var userCache = make(map[int]User)
@@ -85,6 +86,11 @@ func createUser(
 		return
 	}
 
+	if user.Age == 0 {
+		http.Error(w, "age is required", http.StatusBadRequest)
+		return
+	}
+
 	userCache[len(userCache)+1] = user
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -136,6 +142,10 @@ func updateUser(
 		return
 	}
 
+	if user.Age == 0 {
+		http.Error(w, "age is required", http.StatusBadRequest)
+		return
+	}
 	userCache[id] = user
 
 	w.WriteHeader(http.StatusNoContent)

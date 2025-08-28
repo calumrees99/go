@@ -16,6 +16,7 @@ var userCache = make(map[int]User)
 func main() {
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /users", getUsers)
 	mux.HandleFunc("GET /users/{id}", getUser)
 	mux.HandleFunc("POST /users", createUser)
 	mux.HandleFunc("DELETE /users/{id}", deleteUser)
@@ -23,6 +24,22 @@ func main() {
 	// Start server
 	fmt.Println("Server is listening on :8080")
 	http.ListenAndServe(":8080", mux)
+}
+func getUsers(
+	w http.ResponseWriter,
+	r *http.Request) {
+
+	users := userCache
+
+	w.Header().Set("Content-Type", "application.json")
+	j, err := json.Marshal(users)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(j)
 }
 
 func getUser(
